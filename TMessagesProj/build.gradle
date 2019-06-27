@@ -1,0 +1,286 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    google()
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+configurations {
+    compile.exclude module: 'support-v4'
+}
+
+dependencies {
+    compileOnly 'org.checkerframework:checker-qual:2.5.2'
+    compileOnly 'org.checkerframework:checker-compat-qual:2.5.0'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-config:16.1.0'
+//    implementation 'com.urbanairship.android:urbanairship-fcm:9.5.1'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-vision:17.0.2'
+    implementation 'com.google.android.gms:play-services-wallet:16.0.1'
+    implementation 'com.google.android.gms:play-services-wearable:16.0.1'
+    implementation "com.android.support:support-core-ui:$rootProject.supportVersion"
+    implementation "com.android.support:support-compat:$rootProject.supportVersion"
+    implementation "com.android.support:support-core-utils:$rootProject.supportVersion"
+    implementation "com.android.support:support-v13:$rootProject.supportVersion"
+    implementation "com.android.support:palette-v7:$rootProject.supportVersion"
+    implementation "com.android.support:exifinterface:$rootProject.supportVersion"
+    implementation "com.android.support:recyclerview-v7:27.0.0"
+    implementation 'com.googlecode.mp4parser:isoparser:1.0.6'
+    implementation 'com.stripe:stripe-android:2.0.2'
+    annotationProcessor "com.github.instagram.ig-json-parser:processor:$rootProject.igjsonVersion"
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.okhttpVersion"
+    implementation "com.github.instagram.ig-json-parser:runtime:$rootProject.igjsonVersion"
+    implementation project(path: ':inline-youtube-view')
+    implementation(project(path: ":shinebuttonlib")) {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
+    implementation 'org.jsoup:jsoup:1.11.3'
+}
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion '28.0.3'
+
+    defaultConfig.applicationId = "io.bettergram"
+
+    sourceSets.main.jniLibs.srcDirs = ['./jni/']
+
+    externalNativeBuild {
+        ndkBuild {
+            path "jni/Android.mk"
+        }
+    }
+
+    lintOptions {
+        disable 'MissingTranslation'
+        disable 'ExtraTranslation'
+    }
+
+    dexOptions {
+        jumboMode = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("config/release.keystore")
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+
+        release {
+            storeFile file("config/release.keystore")
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+            signingConfig signingConfigs.debug
+            applicationIdSuffix ".beta"
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        foss {
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.release
+            matchingFallbacks = ['debug', 'release']
+        }
+    }
+
+    defaultConfig.versionCode = 1008
+
+    sourceSets.debug {
+        manifest.srcFile 'config/debug/AndroidManifest.xml'
+    }
+
+    sourceSets.release {
+        manifest.srcFile 'config/release/AndroidManifest.xml'
+    }
+
+    sourceSets.foss {
+        manifest.srcFile 'config/foss/AndroidManifest.xml'
+    }
+
+    flavorDimensions "minApi"
+
+    productFlavors {
+        armv7 {
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+            ext {
+                abiVersionCode = 1
+            }
+        }
+        x86 {
+            ndk {
+                abiFilters "x86"
+            }
+            ext {
+                abiVersionCode = 2
+            }
+        }
+        armv7_SDK23 {
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            minSdkVersion 23
+            ext {
+                abiVersionCode = 3
+            }
+        }
+        x86_SDK23 {
+            ndk {
+                abiFilters "x86"
+            }
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            minSdkVersion 23
+            ext {
+                abiVersionCode = 4
+            }
+        }
+        arm64 {
+            ndk {
+                abiFilters "arm64-v8a"
+            }
+            ext {
+                abiVersionCode = 5
+            }
+        }
+        x64 {
+            ndk {
+                abiFilters "x86_64"
+            }
+            ext {
+                abiVersionCode = 6
+            }
+        }
+        arm64_SDK23 {
+            ndk {
+                abiFilters "arm64-v8a"
+            }
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            minSdkVersion 23
+            ext {
+                abiVersionCode = 7
+            }
+        }
+        x64_SDK23 {
+            ndk {
+                abiFilters "x86_64"
+            }
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            minSdkVersion 23
+            ext {
+                abiVersionCode = 8
+            }
+        }
+        afat {
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            ext {
+                abiVersionCode = 0
+            }
+        }
+    }
+
+    applicationVariants.all { variant ->
+//        variant.outputs.all { output ->
+//            output.processManifest.doLast {
+//                def abiVersion = variant.productFlavors.get(0).abiVersionCode
+//                String manifestPath = "$manifestOutputDirectory/AndroidManifest.xml"
+//                def manifestContent = file(manifestPath).getText()
+//                manifestContent = manifestContent.replace(String.format('android:versionCode="%d"', defaultConfig.versionCode), String.format('android:versionCode="%s"', defaultConfig.versionCode * 10 + abiVersion))
+//                file(manifestPath).write(manifestContent)
+//            }
+//        }
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//        def mailchimpApiKey = properties.getProperty("mailchimp.apikey")
+        def mailchimpApiKey = "0ff749460d94d589c16ddf2311d384d8-us3"
+        def mailchimpDataCenter = mailchimpApiKey.split("-")[1]
+        def mailchimpBaseUrl = "https://<dc>.api.mailchimp.com/3.0".replace("<dc>", mailchimpDataCenter)
+        variant.buildConfigField 'String', 'MAILCHIMP_API_KEY', "\"$mailchimpApiKey\""
+        variant.buildConfigField 'String', 'MAILCHIMP_BASE_URL', "\"$mailchimpBaseUrl\""
+//    def mailchimpBaseListId = properties.getProperty("bettergram.mailchimp.base-list-id")
+        def mailchimpBaseListId = "empty"
+//    def mailchimpNewsletterListId = properties.getProperty("bettergram.mailchimp.newsletter-list-id")
+        def mailchimpNewsletterListId = "empty"
+        variant.buildConfigField 'String', 'MAILCHIMP_BASE_LIST_ID', "\"$mailchimpBaseListId\""
+        variant.buildConfigField 'String', 'MAILCHIMP_NEWSLETTER_LIST_ID', "\"$mailchimpNewsletterListId\""
+        def apiId = 463701.toString()
+        def apiHash = "f9c120c81d4db6b016b43574b7f1210d"
+        variant.buildConfigField 'int', 'API_ID', apiId
+        variant.buildConfigField 'String', 'API_HASH', "\"$apiHash\""
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionName "1.0.8"
+
+        vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
+
+        externalNativeBuild {
+            ndkBuild {
+                arguments "NDK_APPLICATION_MK:=jni/Application.mk", "APP_PLATFORM:=android-21", "-j8"
+                abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+            }
+        }
+    }
+}
+
+apply plugin: 'com.google.gms.google-services'

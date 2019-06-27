@@ -1,0 +1,15 @@
+.idea/
+.gradle/
+build/
+obj/
+*.iml
+local.properties
+*.keystore
+*.jks
+gradle.properties
+airshipconfig.properties
+
+TMessagesProj/src/main/java/io/bettergram/telegram/messenger/BuildVars.java
+TMessagesProj/.externalNativeBuild/
+TMessagesProj/google-services.json
+captures/
